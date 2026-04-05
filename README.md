@@ -1,15 +1,15 @@
 # GoPrint
 
-GoPrint adalah aplikasi pemesanan print dan fotokopi untuk lingkungan kampus Unpam Viktor. Repository ini menggunakan konsep monorepo agar frontend dan backend bisa dikembangkan dalam satu tempat yang rapi, mudah dideploy, dan nyaman untuk scale up.
+GoPrint is a print and photocopy ordering application for the Unpam Viktor campus environment. This repository uses a monorepo concept so that the frontend and backend can be developed in one neat place, easily deployed, and comfortable to scale up.
 
-## Struktur Monorepo
+## Monorepo Structure
 
 ```text
 goprint/
 |- frontend/   -> React + TypeScript + Vite
 |- backend/    -> Express + TypeScript
-|- docs/       -> Konsep aplikasi dan arsitektur
-|- database/   -> Skema MySQL awal
+|- docs/       -> Application concepts and architecture
+|- database/   -> Initial MySQL schema
 ```
 
 ## Stack
@@ -20,68 +20,74 @@ goprint/
 - File storage: Vercel Blob
 - Deployment target: Vercel
 
-## Fitur Inti GoPrint
+## Core Features of GoPrint
 
-- Mahasiswa/dosen upload dokumen
-- Pilih jumlah print dan fotokopi per file
-- Pilih metode pengambilan: diantar atau ambil sendiri
-- Pilih metode pembayaran: transfer atau cash
-- Pantau status pesanan secara real-time
-- Admin memantau user, penyedia jasa, dan pesanan
-- Tukang fotokopi memproses pesanan dan update status
+- Students/lecturers upload documents
+- Select print and photocopy quantities per file
+- Choose pickup method: delivery or self-pickup
+- Choose payment method: transfer or cash
+- Monitor order status in real-time
+- Admins monitor users, service providers, and orders
+- Copy shop processes orders and updates status
 
-## Menjalankan Project
+## Running the Project
 
-1. Install dependency:
+1. Install dependencies:
 
 ```bash
 npm install
 ```
 
-2. Jalankan frontend:
+2. Run the frontend:
 
 ```bash
 npm run dev:frontend
 ```
 
-3. Jalankan backend:
+3. Run the backend:
 
 ```bash
 npm run dev:backend
 ```
 
-## Demo Akun MVP
+## MVP Demo Accounts
 
 - Admin: `admin@goprint.local` / `admin123`
-- Tukang fotokopi: `copyshop@goprint.local` / `copy123`
-- Mahasiswa: `student@goprint.local` / `student123`
+- Copy Shop: `copyshop@goprint.local` / `copy123`
+- Student: `student@goprint.local` / `student123`
 
-## Fitur MVP Saat Ini
+## Current MVP Features
 
-- Login dan register user
-- Dashboard role-based untuk admin, tukang fotokopi, dan mahasiswa/dosen
-- CRUD pesanan dasar dari frontend ke backend dengan MySQL
-- Upload dokumen ke Vercel Blob sebelum order dibuat
-- Kalkulasi sederhana print, fotokopi, source print, dan ongkir delivery
-- Data user mendukung `nim` dan `study_program`
-- ID baru pada entitas aplikasi dibuat dalam format UUID
+- User authentication (login & register)
+- Role-based dashboards (admin, copy shop, student/lecturer)
+- Basic CRUD operations for orders (frontend ↔ backend with MySQL)
+- Document upload to Vercel Blob before order creation
+- Basic cost calculation (printing, photocopying, source print, and delivery fee)
+- User data includes `nim` (student ID) and `study_program`
+- All entity IDs are generated using UUID format
 
-## Environment
+## Environment Setup
 
-Salin file contoh environment berikut:
+Copy the example environment files:
 
-- `frontend/.env.example` menjadi `frontend/.env`
-- `backend/.env.example` menjadi `backend/.env`
+- `frontend/.env.example` -> `frontend/.env`
+- `backend/.env.example` -> `backend/.env`
 
-## Setup Database
+## Database Setup
 
-1. Jalankan `database/schema.sql`
-2. Lanjutkan dengan `database/seed.sql`
+1. Run `database/schema.sql`
+2. Then run dengan `database/seed.sql`
 
-## Catatan Deployment Vercel
+## Vercel Deployment Notes
 
-- Frontend dapat dideploy sebagai project Vite.
-- Backend disiapkan dengan entry Express untuk local development dan route `api/index.ts` untuk Vercel.
-- Upload file dokumen menggunakan Vercel Blob agar file dapat disimpan secara terpisah dari server.
+- The frontend can be deployed as a Vite project.
+- The backend is configured with:
+    - Express entry point for local development
+    - `api/index.ts` for Vercel serverless deployment
+- Document uploads use Vercel Blob, allowing files to be stored separately from the server.
 
-Dokumentasi konsep awal dapat dilihat di `docs/architecture.md`, skema database ada di `database/schema.sql`, dan data demo awal ada di `database/seed.sql`.
+For more details:
+
+- Architecture documentation: `docs/architecture.md`
+- Database schema: `database/schema.sql`
+- Initial seed data: `database/seed.sql`

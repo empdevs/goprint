@@ -5,7 +5,7 @@ export async function uploadDocument(fileName: string, content: Buffer, contentT
   const uniqueFileName = `documents/${Date.now()}-${fileName}`;
 
   const blob = await put(uniqueFileName, content, {
-    access: "public",
+    access: "private",
     contentType,
     token: env.BLOB_READ_WRITE_TOKEN
   });

@@ -1,2 +1,8 @@
 .env
 node_modules
+dist
+.vercel
+frontend/.env
+backend/.env
+frontend/dist
+backend/dist

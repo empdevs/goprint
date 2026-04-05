@@ -167,6 +167,13 @@ button {
   gap: 12px;
 }
 
+.user-info,
+.header-title,
+.user-brand {
+  display: flex;
+  flex-direction: column;
+}
+
 .page-section {
   margin-top: 20px;
 }

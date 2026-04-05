@@ -57,7 +57,7 @@ export function DashboardLayout({ title, items, children }: DashboardLayoutProps
       </Sider>
       <Layout>
         <Header className="dashboard-header">
-          <div>
+          <div className="header-title">
             <Typography.Title level={3} style={{ margin: 0 }}>
               {title}
             </Typography.Title>
@@ -65,9 +65,8 @@ export function DashboardLayout({ title, items, children }: DashboardLayoutProps
           </div>
           <div className="header-user">
             <Avatar icon={<UserOutlined />} />
-            <div>
+            <div className="user-info">
               <Typography.Text strong>{session?.user.fullName}</Typography.Text>
-              <br />
               <Typography.Text type="secondary">{session?.user.email}</Typography.Text>
             </div>
           </div>

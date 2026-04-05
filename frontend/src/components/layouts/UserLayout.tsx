@@ -36,9 +36,8 @@ export function UserLayout({ children }: { children: ReactNode }) {
         />
         <div className="header-user">
           <Avatar icon={<UserOutlined />} />
-          <div>
+          <div className="user-info">
             <Typography.Text strong>{session?.user.fullName}</Typography.Text>
-            <br />
             <Typography.Text type="secondary">{session?.user.role}</Typography.Text>
           </div>
           <Button icon={<LogoutOutlined />} onClick={logout}>

@@ -25,6 +25,13 @@ type GoPrintContextValue = {
   createOrder: (form: OrderFormState, file: File | null) => Promise<void>;
   updateOrderStatus: (orderId: string, status: OrderStatus) => Promise<void>;
   deleteOrder: (orderId: string) => Promise<void>;
+  updateProfile: (payload: {
+    fullName: string;
+    phone: string;
+    nim: string;
+    studyProgram: string;
+    campusLocation: string;
+  }) => Promise<void>;
 };
 
 export const GoPrintContext = createContext<GoPrintContextValue | null>(null);
@@ -223,6 +230,46 @@ export function GoPrintProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  async function updateProfile(payload: {
+    fullName: string;
+    phone: string;
+    nim: string;
+    studyProgram: string;
+    campusLocation: string;
+  }) {
+    if (!session) {
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const response = await apiRequest<AuthUser>(
+        "/users/me",
+        {
+          method: "PATCH",
+          body: JSON.stringify(payload)
+        },
+        session.token
+      );
+
+      const nextSession = {
+        ...session,
+        user: response.data
+      };
+
+      setSession(nextSession);
+      setUsers((currentUsers) =>
+        currentUsers.map((user) => (user.id === response.data.id ? response.data : user))
+      );
+      setMessage("Profil berhasil diperbarui.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Gagal memperbarui profil");
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   return (
     <GoPrintContext.Provider
       value={{
@@ -237,7 +284,8 @@ export function GoPrintProvider({ children }: { children: ReactNode }) {
         logout,
         createOrder,
         updateOrderStatus,
-        deleteOrder
+        deleteOrder,
+        updateProfile
       }}
     >
       {children}

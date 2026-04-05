@@ -1,8 +1,11 @@
 import cors from "cors";
 import express from "express";
 import { env } from "./config/env.js";
+import { authRouter } from "./modules/auth/auth.route.js";
 import { healthRouter } from "./modules/health/health.route.js";
 import { ordersRouter } from "./modules/orders/orders.route.js";
+import { uploadsRouter } from "./modules/uploads/uploads.route.js";
+import { usersRouter } from "./modules/users/users.route.js";
 
 export function createApp() {
   const app = express();
@@ -21,8 +24,11 @@ export function createApp() {
     });
   });
 
+  app.use("/api/auth", authRouter);
   app.use("/api/health", healthRouter);
   app.use("/api/orders", ordersRouter);
+  app.use("/api/uploads", uploadsRouter);
+  app.use("/api/users", usersRouter);
 
   return app;
 }

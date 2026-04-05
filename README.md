@@ -50,6 +50,22 @@ npm run dev:frontend
 npm run dev:backend
 ```
 
+## Demo Akun MVP
+
+- Admin: `admin@goprint.local` / `admin123`
+- Tukang fotokopi: `copyshop@goprint.local` / `copy123`
+- Mahasiswa: `student@goprint.local` / `student123`
+
+## Fitur MVP Saat Ini
+
+- Login dan register user
+- Dashboard role-based untuk admin, tukang fotokopi, dan mahasiswa/dosen
+- CRUD pesanan dasar dari frontend ke backend dengan MySQL
+- Upload dokumen ke Vercel Blob sebelum order dibuat
+- Kalkulasi sederhana print, fotokopi, source print, dan ongkir delivery
+- Data user mendukung `nim` dan `study_program`
+- ID baru pada entitas aplikasi dibuat dalam format UUID
+
 ## Environment
 
 Salin file contoh environment berikut:
@@ -57,10 +73,15 @@ Salin file contoh environment berikut:
 - `frontend/.env.example` menjadi `frontend/.env`
 - `backend/.env.example` menjadi `backend/.env`
 
+## Setup Database
+
+1. Jalankan `database/schema.sql`
+2. Lanjutkan dengan `database/seed.sql`
+
 ## Catatan Deployment Vercel
 
 - Frontend dapat dideploy sebagai project Vite.
 - Backend disiapkan dengan entry Express untuk local development dan route `api/index.ts` untuk Vercel.
-- Upload file dokumen dirancang menggunakan Vercel Blob agar file dapat disimpan secara terpisah dari server.
+- Upload file dokumen menggunakan Vercel Blob agar file dapat disimpan secara terpisah dari server.
 
-Dokumentasi konsep awal dapat dilihat di `docs/architecture.md` dan skema database awal ada di `database/schema.sql`.
+Dokumentasi konsep awal dapat dilihat di `docs/architecture.md`, skema database ada di `database/schema.sql`, dan data demo awal ada di `database/seed.sql`.

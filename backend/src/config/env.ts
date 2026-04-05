@@ -20,5 +20,6 @@ export const env = {
   MYSQL_USER: requireEnv("MYSQL_USER", "root"),
   MYSQL_PASSWORD: process.env.MYSQL_PASSWORD ?? "",
   MYSQL_DATABASE: requireEnv("MYSQL_DATABASE", "goprint_db"),
-  BLOB_READ_WRITE_TOKEN: requireEnv("BLOB_READ_WRITE_TOKEN", "development-token")
+  BLOB_READ_WRITE_TOKEN: requireEnv("BLOB_READ_WRITE_TOKEN", "development-token"),
+  AUTH_TOKEN_SECRET: requireEnv("AUTH_TOKEN_SECRET", "goprint-dev-secret")
 };

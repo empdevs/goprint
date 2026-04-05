@@ -2,7 +2,8 @@
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
     "jsx": "react-jsx",
-    "moduleResolution": "Node"
+    "moduleResolution": "Node",
+    "noEmit": true
   },
   "include": [
     "src"

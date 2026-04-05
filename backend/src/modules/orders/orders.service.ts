@@ -82,6 +82,20 @@ const UNIT_PRINT_PRICE = 500;
 const UNIT_COPY_PRICE = 250;
 const UNIT_BINDING_PRICE = 3000;
 
+function isValidStatusTransition(currentStatus: OrderStatus, nextStatus: OrderStatus, pickupMethod: PickupMethod) {
+  const nextMap: Record<OrderStatus, OrderStatus[]> = {
+    pending: ["confirmed", "cancelled"],
+    confirmed: ["processing", "cancelled"],
+    processing: [pickupMethod === "delivery" ? "out_for_delivery" : "ready_for_pickup"],
+    ready_for_pickup: ["completed"],
+    out_for_delivery: ["completed"],
+    completed: [],
+    cancelled: []
+  };
+
+  return nextMap[currentStatus].includes(nextStatus);
+}
+
 export function buildOrderSummary(payload: PreviewOrderInput) {
   const normalizedItems = normalizeOrderItems(payload.items ?? []);
 
@@ -331,6 +345,15 @@ export async function updateOrder(id: string, payload: UpdateOrderInput) {
   }));
 
   const pickupMethod = payload.pickupMethod ?? existingOrder.pickupMethod;
+
+  if (payload.status && payload.status !== existingOrder.status) {
+    const isAllowed = isValidStatusTransition(existingOrder.status, payload.status, pickupMethod);
+
+    if (!isAllowed) {
+      throw new Error(`Transisi status dari ${existingOrder.status} ke ${payload.status} tidak valid`);
+    }
+  }
+
   const pricing = calculatePricing(nextItems, pickupMethod);
   const connection = await db.getConnection();
 
@@ -358,6 +381,35 @@ export async function updateOrder(id: string, payload: UpdateOrderInput) {
     if (payload.items) {
       await connection.query<ResultSetHeader>("DELETE FROM order_items WHERE order_id = ?", [id]);
       await insertOrderItems(connection, id, nextItems);
+    }
+
+    if ((payload.status ?? existingOrder.status) === "completed") {
+      const archivedPayload = JSON.stringify({
+        ...existingOrder,
+        status: payload.status ?? existingOrder.status,
+        pickupMethod,
+        paymentMethod: payload.paymentMethod ?? existingOrder.paymentMethod,
+        notes: payload.notes ?? existingOrder.notes,
+        deliveryAddress: payload.deliveryAddress ?? existingOrder.deliveryAddress,
+        assignedCopyShopId: payload.assignedCopyShopId ?? existingOrder.assignedCopyShopId,
+        items: nextItems.map(({ unitPrintPrice, unitCopyPrice, unitBindingPrice, totalPrice, ...item }) => ({
+          ...item,
+          unitPrintPrice,
+          unitCopyPrice,
+          unitBindingPrice,
+          totalPrice
+        })),
+        subtotal: pricing.subtotal,
+        deliveryFee: pricing.deliveryFee,
+        totalAmount: pricing.totalAmount
+      });
+
+      await connection.query<ResultSetHeader>(
+        `INSERT INTO history (id, order_id, archived_payload)
+         VALUES (?, ?, ?)
+         ON DUPLICATE KEY UPDATE archived_payload = VALUES(archived_payload), completed_at = CURRENT_TIMESTAMP`,
+        [createId("history"), id, archivedPayload]
+      );
     }
 
     await connection.commit();

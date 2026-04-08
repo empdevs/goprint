@@ -5,6 +5,7 @@ import { useGoPrint } from "../hooks/useGoPrint";
 import { getAvailableStatusActions } from "../utils/order-status";
 import { Order } from "../types";
 import { OrderStatusTag } from "./OrderStatusTag";
+import { ORDER_STATUS_LABELS } from "../constants";
 
 type OrdersTableProps = {
   orders: Order[];
@@ -55,7 +56,7 @@ export function OrdersTable({ orders, canDelete = false }: OrdersTableProps) {
       {
         title: "Status",
         key: "status",
-        render: (_, order) => <OrderStatusTag status={order.status} />
+        render: (_, order) => <OrderStatusTag status={order.status} label={ORDER_STATUS_LABELS[order.status]} />
       },
       {
         title: "Total",

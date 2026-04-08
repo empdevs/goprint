@@ -11,6 +11,6 @@ const colorMap: Record<OrderStatus, string> = {
   cancelled: "red"
 };
 
-export function OrderStatusTag({ status }: { status: OrderStatus }) {
-  return <Tag color={colorMap[status]}>{status}</Tag>;
+export function OrderStatusTag({ status, label }: { status: OrderStatus, label?: string }) {
+  return <Tag color={colorMap[status]}>{label ?? status}</Tag>;
 }

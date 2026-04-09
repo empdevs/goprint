@@ -5,7 +5,7 @@ import { useGoPrint } from "../hooks/useGoPrint";
 import { getAvailableStatusActions } from "../utils/order-status";
 import { Order } from "../types";
 import { OrderStatusTag } from "./OrderStatusTag";
-import { ORDER_STATUS_LABELS } from "../constants";
+import { ORDER_STATUS_LABELS, API_BASE_URL } from "../constants";
 
 type OrdersTableProps = {
   orders: Order[];
@@ -28,7 +28,29 @@ export function OrdersTable({ orders, canDelete = false }: OrdersTableProps) {
         render: (_, order) => (
           <Space direction="vertical" size={2}>
             {order.items.map((item) => (
-              <Typography.Link href={item.fileUrl} key={item.id} target="_blank">
+              <Typography.Link
+                key={item.id}
+                onClick={async () => {
+                  if (!session) return;
+                  try {
+                    const res = await fetch(`${API_BASE_URL}/uploads/download?url=${encodeURIComponent(item.fileUrl)}`, {
+                      headers: { Authorization: `Bearer ${session.token}` }
+                    });
+                    if (!res.ok) throw new Error("Gagal akses file");
+                    
+                    const blob = await res.blob();
+                    const fileType = res.headers.get("Content-Type") || "application/octet-stream";
+                    const fileBlob = new Blob([blob], { type: fileType });
+                    
+                    const objUrl = window.URL.createObjectURL(fileBlob);
+                    window.open(objUrl, "PreviewDokumen", "width=800,height=800,menubar=no,toolbar=no,location=no,status=no");
+                    setTimeout(() => window.URL.revokeObjectURL(objUrl), 60000);
+                  } catch (error) {
+                    console.error(error);
+                    alert("Gagal membuka dokumen yang diproteksi.");
+                  }
+                }}
+              >
                 {item.fileName}
               </Typography.Link>
             ))}

@@ -60,3 +60,13 @@ export const studentStatusActions: Record<OrderStatus, StatusAction[]> = {
   completed: [],
   cancelled: []
 };
+
+export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
+  pending: "Pending",
+  confirmed: "Confirmed",
+  processing: "Processing",
+  ready_for_pickup: "Ready for Pickup",
+  out_for_delivery: "Out for Delivery",
+  completed: "Completed",
+  cancelled: "Cancelled"
+};

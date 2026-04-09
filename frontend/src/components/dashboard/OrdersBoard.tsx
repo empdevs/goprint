@@ -1,4 +1,4 @@
-import { roleLabels, statusTone } from "../../constants";
+import { API_BASE_URL, roleLabels, statusTone } from "../../constants";
 import { useGoPrint } from "../../hooks/useGoPrint";
 import { getAvailableStatusActions, getOrderStatusDescription } from "../../utils/order-status";
 
@@ -37,7 +37,30 @@ export function OrdersBoard() {
               <ul className="item-list">
                 {order.items.map((item) => (
                   <li key={item.id}>
-                    <a href={item.fileUrl} rel="noreferrer" target="_blank">
+                    <a
+                      href="#"
+                      onClick={async (e) => {
+                        e.preventDefault();
+                        if (!session) return;
+                        try {
+                          const res = await fetch(`${API_BASE_URL}/uploads/download?url=${encodeURIComponent(item.fileUrl)}`, {
+                            headers: { Authorization: `Bearer ${session.token}` }
+                          });
+                          if (!res.ok) throw new Error("Gagal akses file");
+                          
+                          const blob = await res.blob();
+                          const fileType = res.headers.get("Content-Type") || "application/octet-stream";
+                          const fileBlob = new Blob([blob], { type: fileType });
+                          
+                          const objUrl = window.URL.createObjectURL(fileBlob);
+                          window.open(objUrl, "PreviewDokumen", "width=800,height=800,menubar=no,toolbar=no,location=no,status=no");
+                          setTimeout(() => window.URL.revokeObjectURL(objUrl), 60000);
+                        } catch (error) {
+                          console.error(error);
+                          alert("Gagal membuka dokumen yang diproteksi.");
+                        }
+                      }}
+                    >
                       {item.fileName}
                     </a>{" "}
                     | print {item.printQty} | copy {item.copyQty} | jilid {item.bindingQty} | source{" "}

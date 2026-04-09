@@ -57,11 +57,11 @@ export function AuthPanel() {
       <article className="card">
         <h2>Flow MVP GoPrint</h2>
         <ul className="check-list">
-          <li>User membuat order dan status masuk ke `pending`.</li>
-          <li>Tukang fotokopi menerima pesanan lalu status menjadi `confirmed`.</li>
-          <li>Saat dikerjakan status berubah menjadi `processing`.</li>
-          <li>Jika pickup maka `ready_for_pickup`, jika delivery maka `out_for_delivery`.</li>
-          <li>Pesanan ditutup di `completed` setelah user menerima hasil.</li>
+          <li>User membuat order dan status masuk ke `Pending`.</li>
+          <li>Tukang fotokopi menerima pesanan lalu status menjadi `Confirmed`.</li>
+          <li>Saat dikerjakan status berubah menjadi `Processing`.</li>
+          <li>Jika pickup maka `Ready for Pickup`, jika delivery maka `Out for Delivery`.</li>
+          <li>Pesanan ditutup di `Completed` setelah user menerima hasil.</li>
         </ul>
       </article>
     </section>

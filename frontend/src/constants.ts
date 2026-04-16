@@ -1,4 +1,11 @@
-import { OrderFormState, OrderStatus, RegisterFormState, StatusAction, UserRole } from "./types";
+import {
+  FeedbackFormState,
+  OrderFormState,
+  OrderStatus,
+  RegisterFormState,
+  StatusAction,
+  UserRole
+} from "./types";
 
 export const SESSION_KEY = "goprint-session";
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:4000/api";
@@ -6,14 +13,13 @@ export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localho
 export const demoAccounts = [
   "Admin: admin@goprint.local / admin123",
   "Copy shop: copyshop@goprint.local / copy123",
-  "Student: student@goprint.local / student123"
+  "User: user@goprint.local / student123"
 ];
 
 export const roleLabels: Record<UserRole, string> = {
   admin: "Admin",
   copy_shop: "Tukang Fotokopi",
-  student: "Mahasiswa",
-  lecturer: "Dosen"
+  user: "Mahasiswa / Dosen"
 };
 
 export const statusTone: Record<OrderStatus, string> = {
@@ -29,12 +35,16 @@ export const statusTone: Record<OrderStatus, string> = {
 export const initialRegisterForm: RegisterFormState = {
   fullName: "",
   email: "",
-  phone: "",
   nim: "",
   studyProgram: "",
-  password: "",
-  role: "student",
-  campusLocation: ""
+  password: ""
+};
+
+export const initialFeedbackForm: FeedbackFormState = {
+  name: "",
+  nim: "",
+  studyProgram: "",
+  comment: ""
 };
 
 export const initialOrderForm: OrderFormState = {
@@ -51,7 +61,7 @@ export const initialOrderForm: OrderFormState = {
   orderNotes: ""
 };
 
-export const studentStatusActions: Record<OrderStatus, StatusAction[]> = {
+export const userStatusActions: Record<OrderStatus, StatusAction[]> = {
   pending: [{ label: "Batalkan", nextStatus: "cancelled" }],
   confirmed: [],
   processing: [],

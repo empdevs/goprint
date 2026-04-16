@@ -29,7 +29,7 @@ export function getAvailableStatusActions(role: UserRole, order: Order): StatusA
     return getWorkerNextStatus(order);
   }
 
-  if (role === "student" || role === "lecturer") {
+  if (role === "user") {
     switch (order.status) {
       case "pending":
         return [{ label: "Batalkan", nextStatus: "cancelled" }];

@@ -1,6 +1,8 @@
+import { ReactNode } from "react";
 import { ConfigProvider, Result, Spin } from "antd";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { useGoPrint } from "../hooks/useGoPrint";
+import { UserRole } from "../types";
 import { AuthLandingPage } from "../pages/AuthLandingPage";
 import { AdminOrdersPage } from "../pages/admin/AdminOrdersPage";
 import { AdminOverviewPage } from "../pages/admin/AdminOverviewPage";
@@ -34,8 +36,8 @@ function ProtectedRoute({
   allow,
   children
 }: {
-  allow: Array<"admin" | "copy_shop" | "student" | "lecturer">;
-  children: JSX.Element;
+  allow: UserRole[];
+  children: ReactNode;
 }) {
   const { session, isLoading } = useGoPrint();
 
@@ -119,7 +121,7 @@ export function AppShell() {
 
         <Route
           element={
-            <ProtectedRoute allow={["student", "lecturer"]}>
+            <ProtectedRoute allow={["user"]}>
               <UserHomePage />
             </ProtectedRoute>
           }
@@ -127,7 +129,7 @@ export function AppShell() {
         />
         <Route
           element={
-            <ProtectedRoute allow={["student", "lecturer"]}>
+            <ProtectedRoute allow={["user"]}>
               <UserOrdersPage />
             </ProtectedRoute>
           }
@@ -135,7 +137,7 @@ export function AppShell() {
         />
         <Route
           element={
-            <ProtectedRoute allow={["student", "lecturer"]}>
+            <ProtectedRoute allow={["user"]}>
               <UserHistoryPage />
             </ProtectedRoute>
           }
@@ -143,7 +145,7 @@ export function AppShell() {
         />
         <Route
           element={
-            <ProtectedRoute allow={["student", "lecturer"]}>
+            <ProtectedRoute allow={["user"]}>
               <UserProfilePage />
             </ProtectedRoute>
           }

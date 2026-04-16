@@ -9,7 +9,7 @@ CREATE TABLE users (
   nim VARCHAR(30),
   study_program VARCHAR(120),
   password_hash VARCHAR(255) NOT NULL,
-  role ENUM('admin', 'copy_shop', 'student', 'lecturer') NOT NULL,
+  role ENUM('admin', 'copy_shop', 'user') NOT NULL,
   campus_location VARCHAR(120),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -86,4 +86,13 @@ CREATE TABLE history (
   archived_payload JSON NOT NULL,
   CONSTRAINT fk_history_order
     FOREIGN KEY (order_id) REFERENCES orders(id)
+);
+
+CREATE TABLE feedbacks (
+  id CHAR(36) PRIMARY KEY,
+  name VARCHAR(120) NOT NULL,
+  nim VARCHAR(30),
+  study_program VARCHAR(120),
+  comment TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

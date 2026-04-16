@@ -1,4 +1,4 @@
-export type UserRole = "admin" | "copy_shop" | "student" | "lecturer";
+export type UserRole = "admin" | "copy_shop" | "user";
 
 export type PickupMethod = "pickup" | "delivery";
 export type PaymentMethod = "cash" | "bank_transfer";
@@ -35,6 +35,15 @@ export type User = {
   password: string;
   role: UserRole;
   campusLocation: string;
+  createdAt: string;
+};
+
+export type Feedback = {
+  id: string;
+  name: string;
+  nim: string;
+  studyProgram: string;
+  comment: string;
   createdAt: string;
 };
 

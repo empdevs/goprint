@@ -5,7 +5,7 @@ export function OrderCreateCard() {
   const { session } = useGoPrint();
   const { orderForm, setOrderForm, setSelectedFile, handleSubmit } = useOrderForm();
 
-  if (!session || !["student", "lecturer", "admin"].includes(session.user.role)) {
+  if (!session || !["user", "admin"].includes(session.user.role)) {
     return null;
   }
 

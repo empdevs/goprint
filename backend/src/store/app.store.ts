@@ -31,12 +31,12 @@ const users: User[] = [
   {
     id: "0e64804a-3b0e-4bb6-a8b1-912c370428e8",
     fullName: "Alya Mahasiswa",
-    email: "student@goprint.local",
+    email: "user@goprint.local",
     phone: "081200000003",
     nim: "221011700123",
     studyProgram: "Teknik Informatika",
     password: "student123",
-    role: "student",
+    role: "user",
     campusLocation: "Gedung Viktor Lt. 5",
     createdAt: now
   }

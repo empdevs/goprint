@@ -153,6 +153,14 @@ export function GoPrintProvider({ children }: { children: ReactNode }) {
         throw new Error("Silakan pilih file dokumen terlebih dahulu");
       }
 
+      if (form.pickupMethod === "delivery" && !form.deliveryAddress.trim()) {
+        throw new Error("Alamat pengantaran wajib diisi jika memilih metode delivery");
+      }
+
+      if (form.printQty < 1 && form.copyQty < 1 && form.bindingQty < 1) {
+        throw new Error("Minimal pilih salah satu layanan print, fotokopi, atau jilid");
+      }
+
       const base64Content = await readFileAsBase64(file);
       const uploadResponse = await apiRequest<UploadResponse>(
         "/uploads",
@@ -175,17 +183,17 @@ export function GoPrintProvider({ children }: { children: ReactNode }) {
             pickupMethod: form.pickupMethod,
             paymentMethod: form.paymentMethod,
             deliveryAddress: form.deliveryAddress,
-            notes: form.orderNotes,
+            notes: "",
             items: [
               {
                 fileName: form.fileName || file.name,
                 fileUrl: uploadResponse.data.url,
-                fileType: form.fileType || file.type || "document",
+                fileType: file.type || file.name.split(".").pop()?.toLowerCase() || "document",
                 printQty: Number(form.printQty),
                 copyQty: Number(form.copyQty),
                 bindingQty: Number(form.bindingQty),
                 description: form.description,
-                notes: form.notes
+                notes: ""
               }
             ]
           })

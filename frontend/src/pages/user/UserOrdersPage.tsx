@@ -12,7 +12,8 @@ export function UserOrdersPage() {
       <div className="page-section">
         <Typography.Title level={3}>Pesanan Saya</Typography.Title>
         <Typography.Paragraph>
-          Buat pesanan baru, pantau progresnya, lalu konfirmasi saat hasil sudah diterima.
+          Susun pesanan seperti keranjang, kirim dokumen yang ingin diproses, lalu pantau statusnya
+          sampai selesai.
         </Typography.Paragraph>
       </div>
       <OrderCreateCard />

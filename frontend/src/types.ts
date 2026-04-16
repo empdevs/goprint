@@ -97,16 +97,13 @@ export type FeedbackFormState = {
 
 export type OrderFormState = {
   fileName: string;
-  fileType: string;
   printQty: number;
   copyQty: number;
   bindingQty: number;
   description: string;
-  notes: string;
   pickupMethod: PickupMethod;
   paymentMethod: PaymentMethod;
   deliveryAddress: string;
-  orderNotes: string;
 };
 
 export type StatusAction = {

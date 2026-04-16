@@ -49,16 +49,13 @@ export const initialFeedbackForm: FeedbackFormState = {
 
 export const initialOrderForm: OrderFormState = {
   fileName: "",
-  fileType: "pdf",
   printQty: 1,
   copyQty: 0,
   bindingQty: 0,
   description: "",
-  notes: "",
   pickupMethod: "pickup",
   paymentMethod: "cash",
-  deliveryAddress: "",
-  orderNotes: ""
+  deliveryAddress: ""
 };
 
 export const userStatusActions: Record<OrderStatus, StatusAction[]> = {

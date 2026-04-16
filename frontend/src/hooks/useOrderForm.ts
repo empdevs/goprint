@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { useState } from "react";
 import { initialOrderForm } from "../constants";
 import { useGoPrint } from "./useGoPrint";
 
@@ -7,8 +7,22 @@ export function useOrderForm() {
   const [orderForm, setOrderForm] = useState(initialOrderForm);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  function setDocumentFile(file: File | null) {
+    setSelectedFile(file);
+    setOrderForm((current) => ({
+      ...current,
+      fileName: file?.name ?? ""
+    }));
+  }
+
+  function updateQuantity(field: "printQty" | "copyQty" | "bindingQty", nextValue: number) {
+    setOrderForm((current) => ({
+      ...current,
+      [field]: Math.max(0, nextValue)
+    }));
+  }
+
+  async function handleSubmit() {
     await createOrder(orderForm, selectedFile);
     setOrderForm(initialOrderForm);
     setSelectedFile(null);
@@ -18,7 +32,8 @@ export function useOrderForm() {
     orderForm,
     setOrderForm,
     selectedFile,
-    setSelectedFile,
+    setDocumentFile,
+    updateQuantity,
     handleSubmit
   };
 }

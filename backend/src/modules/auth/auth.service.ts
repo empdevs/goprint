@@ -80,12 +80,12 @@ export async function registerUser(payload: RegisterPayload) {
       userId,
       payload.fullName,
       payload.email.toLowerCase(),
-      payload.phone,
+      "",
       payload.nim ?? "",
       payload.studyProgram ?? "",
       passwordHash,
-      payload.role,
-      payload.campusLocation
+      "user",
+      ""
     ]
   );
 

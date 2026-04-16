@@ -1,4 +1,4 @@
-export type UserRole = "admin" | "copy_shop" | "student" | "lecturer";
+export type UserRole = "admin" | "copy_shop" | "user";
 export type PickupMethod = "pickup" | "delivery";
 export type PaymentMethod = "cash" | "bank_transfer";
 export type OrderStatus =
@@ -74,26 +74,36 @@ export type UploadResponse = {
 export type RegisterFormState = {
   fullName: string;
   email: string;
-  phone: string;
   nim: string;
   studyProgram: string;
   password: string;
-  role: UserRole;
-  campusLocation: string;
+};
+
+export type Feedback = {
+  id: string;
+  name: string;
+  nim: string;
+  studyProgram: string;
+  comment: string;
+  createdAt: string;
+};
+
+export type FeedbackFormState = {
+  name: string;
+  nim: string;
+  studyProgram: string;
+  comment: string;
 };
 
 export type OrderFormState = {
   fileName: string;
-  fileType: string;
   printQty: number;
   copyQty: number;
   bindingQty: number;
   description: string;
-  notes: string;
   pickupMethod: PickupMethod;
   paymentMethod: PaymentMethod;
   deliveryAddress: string;
-  orderNotes: string;
 };
 
 export type StatusAction = {

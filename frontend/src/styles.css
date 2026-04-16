@@ -133,6 +133,44 @@ button {
   grid-template-columns: 1.1fr 0.9fr;
 }
 
+.auth-page {
+  margin-top: 22px;
+}
+
+.auth-panel-card {
+  height: 100%;
+  border: 0;
+  border-radius: 24px !important;
+  box-shadow: 0 18px 38px rgba(22, 34, 53, 0.08);
+}
+
+.auth-panel-card .ant-card-body {
+  padding: 24px;
+}
+
+.auth-hero-card {
+  min-height: 100%;
+  background: linear-gradient(180deg, #ffffff, #eef5ff);
+}
+
+.auth-hero-card h2.ant-typography {
+  margin-top: 10px;
+  margin-bottom: 12px;
+}
+
+.auth-page .ant-tabs-nav {
+  margin-bottom: 20px;
+}
+
+.auth-page .ant-list-item {
+  align-items: flex-start;
+}
+
+.auth-page .ant-btn-primary {
+  min-height: 44px;
+  font-weight: 700;
+}
+
 .card {
   padding: 24px;
 }
@@ -151,6 +189,9 @@ button {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  height: auto;
+  min-height: 72px;
+  line-height: normal;
   padding: 18px 24px;
   background: rgba(255, 255, 255, 0.92);
   border-bottom: 1px solid #e7edf4;
@@ -165,6 +206,24 @@ button {
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-wrap: wrap;
+}
+
+.mobile-account-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  background: #eef4ff;
+  color: #184276;
+}
+
+.account-menu-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
 .user-info,
@@ -191,11 +250,40 @@ button {
 }
 
 .user-menu {
-  flex: 1;
-  min-width: 0;
-  justify-content: center;
   background: transparent;
   border-bottom: 0 !important;
+}
+
+.user-menu-desktop {
+  display: flex;
+  justify-content: center;
+  padding: 0 24px;
+  background: rgba(255, 255, 255, 0.94);
+  border-bottom: 1px solid #e7edf4 !important;
+}
+
+.user-mobile-nav {
+  position: sticky;
+  bottom: 0;
+  z-index: 20;
+  background: rgba(255, 255, 255, 0.96);
+  border-top: 1px solid #e7edf4;
+  box-shadow: 0 -12px 24px rgba(22, 34, 53, 0.08);
+}
+
+.user-menu-mobile {
+  display: flex;
+  justify-content: space-around;
+  padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+}
+
+.user-menu-mobile .ant-menu-item {
+  margin-inline: 0 !important;
+  padding-inline: 10px !important;
+}
+
+.user-content-mobile {
+  padding-bottom: 104px;
 }
 
 .user-page-hero {
@@ -334,6 +422,89 @@ textarea {
   gap: 14px;
 }
 
+.order-cart-card {
+  border: 0;
+  border-radius: 24px !important;
+  box-shadow: 0 18px 38px rgba(22, 34, 53, 0.08);
+}
+
+.order-cart-header {
+  margin-bottom: 18px;
+}
+
+.order-upload.ant-upload-wrapper .ant-upload-drag {
+  border-radius: 18px;
+  border-color: #c8dcf4;
+  background: #f8fbff;
+}
+
+.order-cart-item {
+  margin-top: 18px;
+  padding: 18px;
+  border-radius: 20px;
+  background: #f8fbff;
+  border: 1px solid #dce8f6;
+}
+
+.order-cart-file {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.order-cart-file-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: #eaf2ff;
+  color: #0f6bcf;
+  font-size: 1.2rem;
+}
+
+.order-cart-file-name {
+  margin: 2px 0 0 !important;
+  color: #5b7088;
+}
+
+.quantity-card {
+  height: 100%;
+  padding: 16px;
+  border-radius: 16px;
+  background: white;
+  border: 1px solid #e3edf8;
+}
+
+.quantity-card-title {
+  margin-bottom: 14px;
+}
+
+.quantity-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.quantity-value {
+  min-width: 28px;
+  text-align: center;
+  font-size: 1rem;
+}
+
+.option-group {
+  display: flex;
+  width: 100%;
+}
+
+.option-group .ant-radio-button-wrapper {
+  flex: 1;
+  text-align: center;
+}
+
 .full-span {
   grid-column: 1 / -1;
 }
@@ -429,5 +600,45 @@ textarea {
   .header-user {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .user-header {
+    padding: 16px 18px;
+    min-height: unset;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .user-brand {
+    min-width: auto;
+    flex: 1;
+  }
+
+  .header-user {
+    width: 100%;
+  }
+
+  .user-content {
+    padding: 18px;
+  }
+
+  .user-page-hero {
+    padding: 22px;
+  }
+
+  .order-cart-card .ant-card-body {
+    padding: 18px !important;
+  }
+
+  .order-cart-file {
+    align-items: flex-start;
+  }
+
+  .quantity-stepper {
+    justify-content: flex-start;
+  }
+
+  .auth-panel-card .ant-card-body {
+    padding: 20px;
   }
 }

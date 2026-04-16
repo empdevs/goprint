@@ -54,7 +54,7 @@ npm run dev:backend
 
 - Admin: `admin@goprint.local` / `admin123`
 - Copy Shop: `copyshop@goprint.local` / `copy123`
-- Student: `student@goprint.local` / `student123`
+- User: `user@goprint.local` / `student123`
 
 ## Current MVP Features
 

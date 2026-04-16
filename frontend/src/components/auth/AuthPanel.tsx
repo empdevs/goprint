@@ -1,8 +1,10 @@
-import { roleLabels } from "../../constants";
+import { Button, Card, Col, Form, Input, List, Row, Space, Tabs, Typography } from "antd";
+import { demoAccounts } from "../../constants";
 import { useAuthForm } from "../../hooks/useAuthForm";
 
 export function AuthPanel() {
   const {
+    feedbacks,
     authMode,
     setAuthMode,
     loginEmail,
@@ -11,59 +13,195 @@ export function AuthPanel() {
     setLoginPassword,
     registerForm,
     setRegisterForm,
+    feedbackForm,
+    setFeedbackForm,
     handleLogin,
-    handleRegister
+    handleRegister,
+    handleFeedbackSubmit
   } = useAuthForm();
 
   return (
-    <section className="auth-layout">
-      <article className="card">
-        <div className="tab-row">
-          <button className={authMode === "login" ? "tab active" : "tab"} onClick={() => setAuthMode("login")} type="button">
-            Login
-          </button>
-          <button className={authMode === "register" ? "tab active" : "tab"} onClick={() => setAuthMode("register")} type="button">
-            Register
-          </button>
-        </div>
+    <section className="auth-page">
+      <Row gutter={[16, 16]}>
+        <Col lg={8} xs={24}>
+          <Card className="auth-panel-card auth-hero-card">
+            <Typography.Text className="eyebrow">GoPrint Feedback Loop</Typography.Text>
+            <Typography.Title level={2}>Cetak dokumen kampus tanpa ribet turun ke basement.</Typography.Title>
+            <Typography.Paragraph>
+              GoPrint membantu mahasiswa dan dosen pesan print, fotokopi, sampai jilid secara
+              online, lalu memantau progresnya sampai selesai.
+            </Typography.Paragraph>
+          </Card>
+        </Col>
 
-        {authMode === "login" ? (
-          <form className="stack" onSubmit={handleLogin}>
-            <label>Email<input value={loginEmail} onChange={(event) => setLoginEmail(event.target.value)} /></label>
-            <label>Password<input type="password" value={loginPassword} onChange={(event) => setLoginPassword(event.target.value)} /></label>
-            <button className="primary-btn" type="submit">Masuk ke Dashboard</button>
-          </form>
-        ) : (
-          <form className="stack" onSubmit={handleRegister}>
-            <label>Nama Lengkap<input value={registerForm.fullName} onChange={(event) => setRegisterForm((current) => ({ ...current, fullName: event.target.value }))} /></label>
-            <label>Email<input value={registerForm.email} onChange={(event) => setRegisterForm((current) => ({ ...current, email: event.target.value }))} /></label>
-            <label>Nomor HP<input value={registerForm.phone} onChange={(event) => setRegisterForm((current) => ({ ...current, phone: event.target.value }))} /></label>
-            <label>NIM<input value={registerForm.nim} onChange={(event) => setRegisterForm((current) => ({ ...current, nim: event.target.value }))} placeholder="Opsional untuk dosen/copy shop" /></label>
-            <label>Program Studi<input value={registerForm.studyProgram} onChange={(event) => setRegisterForm((current) => ({ ...current, studyProgram: event.target.value }))} placeholder="Contoh: Teknik Informatika" /></label>
-            <label>Password<input type="password" value={registerForm.password} onChange={(event) => setRegisterForm((current) => ({ ...current, password: event.target.value }))} /></label>
-            <label>Role
-              <select value={registerForm.role} onChange={(event) => setRegisterForm((current) => ({ ...current, role: event.target.value as typeof current.role }))}>
-                <option value="student">{roleLabels.student}</option>
-                <option value="lecturer">{roleLabels.lecturer}</option>
-                <option value="copy_shop">{roleLabels.copy_shop}</option>
-              </select>
-            </label>
-            <label>Lokasi Kampus<input value={registerForm.campusLocation} onChange={(event) => setRegisterForm((current) => ({ ...current, campusLocation: event.target.value }))} /></label>
-            <button className="primary-btn" type="submit">Buat Akun</button>
-          </form>
-        )}
-      </article>
+        <Col lg={7} xs={24}>
+          <Card className="auth-panel-card">
+            <Typography.Title level={4}>Akun Demo</Typography.Title>
+            <List
+              dataSource={demoAccounts}
+              renderItem={(item) => <List.Item>{item}</List.Item>}
+              size="small"
+            />
+          </Card>
+        </Col>
 
-      <article className="card">
-        <h2>Flow MVP GoPrint</h2>
-        <ul className="check-list">
-          <li>User membuat order dan status masuk ke `Pending`.</li>
-          <li>Tukang fotokopi menerima pesanan lalu status menjadi `Confirmed`.</li>
-          <li>Saat dikerjakan status berubah menjadi `Processing`.</li>
-          <li>Jika pickup maka `Ready for Pickup`, jika delivery maka `Out for Delivery`.</li>
-          <li>Pesanan ditutup di `Completed` setelah user menerima hasil.</li>
-        </ul>
-      </article>
+        <Col lg={9} xs={24}>
+          <Card className="auth-panel-card">
+            <Tabs
+              activeKey={authMode}
+              items={[
+                {
+                  key: "login",
+                  label: "Login",
+                  children: (
+                    <Form layout="vertical" onFinish={() => void handleLogin()}>
+                      <Form.Item label="Email">
+                        <Input value={loginEmail} onChange={(event) => setLoginEmail(event.target.value)} />
+                      </Form.Item>
+                      <Form.Item label="Password">
+                        <Input.Password
+                          value={loginPassword}
+                          onChange={(event) => setLoginPassword(event.target.value)}
+                        />
+                      </Form.Item>
+                      <Button block htmlType="submit" type="primary">
+                        Masuk ke Dashboard
+                      </Button>
+                    </Form>
+                  )
+                },
+                {
+                  key: "register",
+                  label: "Register",
+                  children: (
+                    <Form layout="vertical" onFinish={() => void handleRegister()}>
+                      <Form.Item label="Nama Lengkap">
+                        <Input
+                          value={registerForm.fullName}
+                          onChange={(event) =>
+                            setRegisterForm((current) => ({ ...current, fullName: event.target.value }))
+                          }
+                        />
+                      </Form.Item>
+                      <Form.Item label="Email">
+                        <Input
+                          value={registerForm.email}
+                          onChange={(event) =>
+                            setRegisterForm((current) => ({ ...current, email: event.target.value }))
+                          }
+                        />
+                      </Form.Item>
+                      <Form.Item label="NIM">
+                        <Input
+                          value={registerForm.nim}
+                          onChange={(event) =>
+                            setRegisterForm((current) => ({ ...current, nim: event.target.value }))
+                          }
+                        />
+                      </Form.Item>
+                      <Form.Item label="Program Studi">
+                        <Input
+                          value={registerForm.studyProgram}
+                          onChange={(event) =>
+                            setRegisterForm((current) => ({
+                              ...current,
+                              studyProgram: event.target.value
+                            }))
+                          }
+                        />
+                      </Form.Item>
+                      <Form.Item label="Password">
+                        <Input.Password
+                          value={registerForm.password}
+                          onChange={(event) =>
+                            setRegisterForm((current) => ({ ...current, password: event.target.value }))
+                          }
+                        />
+                      </Form.Item>
+                      <Button block htmlType="submit" type="primary">
+                        Buat Akun
+                      </Button>
+                    </Form>
+                  )
+                }
+              ]}
+              onChange={(key) => setAuthMode(key as "login" | "register")}
+            />
+          </Card>
+        </Col>
+      </Row>
+
+      <Row gutter={[16, 16]} style={{ marginTop: 8 }}>
+        <Col lg={10} xs={24}>
+          <Card className="auth-panel-card">
+            <Typography.Title level={4}>Feedback / Komentar</Typography.Title>
+            <Form layout="vertical" onFinish={() => void handleFeedbackSubmit()}>
+              <Form.Item label="Nama">
+                <Input
+                  value={feedbackForm.name}
+                  onChange={(event) =>
+                    setFeedbackForm((current) => ({ ...current, name: event.target.value }))
+                  }
+                />
+              </Form.Item>
+              <Form.Item label="NIM">
+                <Input
+                  value={feedbackForm.nim}
+                  onChange={(event) =>
+                    setFeedbackForm((current) => ({ ...current, nim: event.target.value }))
+                  }
+                />
+              </Form.Item>
+              <Form.Item label="Program Studi">
+                <Input
+                  value={feedbackForm.studyProgram}
+                  onChange={(event) =>
+                    setFeedbackForm((current) => ({
+                      ...current,
+                      studyProgram: event.target.value
+                    }))
+                  }
+                />
+              </Form.Item>
+              <Form.Item label="Komentar">
+                <Input.TextArea
+                  rows={4}
+                  value={feedbackForm.comment}
+                  onChange={(event) =>
+                    setFeedbackForm((current) => ({ ...current, comment: event.target.value }))
+                  }
+                />
+              </Form.Item>
+              <Button htmlType="submit" type="primary">
+                Kirim Feedback
+              </Button>
+            </Form>
+          </Card>
+        </Col>
+
+        <Col lg={14} xs={24}>
+          <Card className="auth-panel-card">
+            <Typography.Title level={4}>Komentar Pengguna</Typography.Title>
+            <List
+              dataSource={feedbacks}
+              locale={{ emptyText: "Belum ada komentar publik." }}
+              renderItem={(feedback) => (
+                <List.Item>
+                  <Space direction="vertical" size={2}>
+                    <Typography.Text strong>{feedback.name}</Typography.Text>
+                    <Typography.Text type="secondary">
+                      {feedback.nim || "-"} | {feedback.studyProgram || "-"}
+                    </Typography.Text>
+                    <Typography.Paragraph style={{ marginBottom: 0 }}>
+                      {feedback.comment}
+                    </Typography.Paragraph>
+                  </Space>
+                </List.Item>
+              )}
+            />
+          </Card>
+        </Col>
+      </Row>
     </section>
   );
 }

@@ -122,5 +122,13 @@ export function OrdersTable({ orders, canDelete = false }: OrdersTableProps) {
     ];
   }, [canDelete, deleteOrder, session, updateOrderStatus]);
 
-  return <Table columns={columns} dataSource={orders} pagination={{ pageSize: 5 }} rowKey="id" />;
+  return (
+    <Table
+      columns={columns}
+      dataSource={orders}
+      pagination={{ pageSize: 5 }}
+      rowKey="id"
+      scroll={{ x: 900 }}
+    />
+  );
 }

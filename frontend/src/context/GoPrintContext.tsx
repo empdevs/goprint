@@ -5,6 +5,8 @@ import { readFileAsBase64 } from "../utils/file";
 import {
   AppSession,
   AuthUser,
+  Feedback,
+  FeedbackFormState,
   Order,
   OrderFormState,
   OrderStatus,
@@ -16,6 +18,7 @@ type GoPrintContextValue = {
   session: AppSession | null;
   orders: Order[];
   users: AuthUser[];
+  feedbacks: Feedback[];
   message: string;
   isLoading: boolean;
   demoAccounts: string[];
@@ -32,6 +35,7 @@ type GoPrintContextValue = {
     studyProgram: string;
     campusLocation: string;
   }) => Promise<void>;
+  submitFeedback: (payload: FeedbackFormState) => Promise<void>;
 };
 
 export const GoPrintContext = createContext<GoPrintContextValue | null>(null);
@@ -40,8 +44,13 @@ export function GoPrintProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<AppSession | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
   const [users, setUsers] = useState<AuthUser[]>([]);
+  const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
   const [message, setMessage] = useState("Silakan login untuk mulai menggunakan GoPrint.");
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    void loadFeedbacks();
+  }, []);
 
   useEffect(() => {
     const rawSession = window.localStorage.getItem(SESSION_KEY);
@@ -52,6 +61,15 @@ export function GoPrintProvider({ children }: { children: ReactNode }) {
 
     setSession(JSON.parse(rawSession) as AppSession);
   }, []);
+
+  async function loadFeedbacks() {
+    try {
+      const response = await apiRequest<Feedback[]>("/feedbacks");
+      setFeedbacks(response.data);
+    } catch {
+      setFeedbacks([]);
+    }
+  }
 
   useEffect(() => {
     if (!session) {
@@ -135,6 +153,14 @@ export function GoPrintProvider({ children }: { children: ReactNode }) {
         throw new Error("Silakan pilih file dokumen terlebih dahulu");
       }
 
+      if (form.pickupMethod === "delivery" && !form.deliveryAddress.trim()) {
+        throw new Error("Alamat pengantaran wajib diisi jika memilih metode delivery");
+      }
+
+      if (form.printQty < 1 && form.copyQty < 1 && form.bindingQty < 1) {
+        throw new Error("Minimal pilih salah satu layanan print, fotokopi, atau jilid");
+      }
+
       const base64Content = await readFileAsBase64(file);
       const uploadResponse = await apiRequest<UploadResponse>(
         "/uploads",
@@ -157,17 +183,17 @@ export function GoPrintProvider({ children }: { children: ReactNode }) {
             pickupMethod: form.pickupMethod,
             paymentMethod: form.paymentMethod,
             deliveryAddress: form.deliveryAddress,
-            notes: form.orderNotes,
+            notes: "",
             items: [
               {
                 fileName: form.fileName || file.name,
                 fileUrl: uploadResponse.data.url,
-                fileType: form.fileType || file.type || "document",
+                fileType: file.type || file.name.split(".").pop()?.toLowerCase() || "document",
                 printQty: Number(form.printQty),
                 copyQty: Number(form.copyQty),
                 bindingQty: Number(form.bindingQty),
                 description: form.description,
-                notes: form.notes
+                notes: ""
               }
             ]
           })
@@ -270,12 +296,39 @@ export function GoPrintProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  async function submitFeedback(payload: FeedbackFormState) {
+    setIsLoading(true);
+
+    try {
+      const response = await apiRequest<Feedback>(
+        "/feedbacks",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            name: payload.name,
+            nim: payload.nim,
+            studyProgram: payload.studyProgram,
+            comment: payload.comment
+          })
+        }
+      );
+
+      setFeedbacks((currentFeedbacks) => [response.data, ...currentFeedbacks]);
+      setMessage("Terima kasih, feedback kamu sudah masuk.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Gagal mengirim feedback");
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   return (
     <GoPrintContext.Provider
       value={{
         session,
         orders,
         users,
+        feedbacks,
         message,
         isLoading,
         demoAccounts,
@@ -285,7 +338,8 @@ export function GoPrintProvider({ children }: { children: ReactNode }) {
         createOrder,
         updateOrderStatus,
         deleteOrder,
-        updateProfile
+        updateProfile,
+        submitFeedback
       }}
     >
       {children}

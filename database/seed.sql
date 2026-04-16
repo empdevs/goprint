@@ -27,12 +27,12 @@ VALUES
   (
     '0e64804a-3b0e-4bb6-a8b1-912c370428e8',
     'Alya Mahasiswa',
-    'student@goprint.local',
+    'user@goprint.local',
     '081200000003',
     '221011700123',
     'Teknik Informatika',
     '04dfce0beafdc02a185f04cf9ed99400:86cfd9163a08f93493c80c0713a62e68cd2d074c050ff38840f3c2f2c0530794b8a021063ebf499c2cecd42ac6d0750f5cb07620f78fac6543cf54cd5473f876',
-    'student',
+    'user',
     'Gedung Viktor Lt. 5'
   )
 ON DUPLICATE KEY UPDATE
@@ -43,3 +43,25 @@ ON DUPLICATE KEY UPDATE
   password_hash = VALUES(password_hash),
   role = VALUES(role),
   campus_location = VALUES(campus_location);
+
+INSERT INTO feedbacks (id, name, nim, study_program, comment)
+VALUES
+  (
+    '2ec18d0f-363d-40c7-9351-8e71f3d6dd48',
+    'Alya Mahasiswa',
+    '221011700123',
+    'Teknik Informatika',
+    'UI GoPrint sudah membantu, tapi akan lebih nyaman kalau feedback publik bisa langsung terlihat di halaman login.'
+  ),
+  (
+    '9c2ca9b7-6034-45cd-9262-884c14a93b2f',
+    'Bagas Unpam',
+    '221011700451',
+    'Sistem Informasi',
+    'Saya suka ide pemesanan online. Akan mantap kalau user bisa pilih gerai fotokopi terdekat.'
+  )
+ON DUPLICATE KEY UPDATE
+  name = VALUES(name),
+  nim = VALUES(nim),
+  study_program = VALUES(study_program),
+  comment = VALUES(comment);

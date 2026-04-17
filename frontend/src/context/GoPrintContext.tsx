@@ -25,7 +25,7 @@ type GoPrintContextValue = {
   login: (email: string, password: string) => Promise<void>;
   register: (form: RegisterFormState) => Promise<void>;
   logout: () => void;
-  createOrder: (form: OrderFormState, file: File | null) => Promise<void>;
+  createOrder: (form: OrderFormState) => Promise<boolean>;
   updateOrderStatus: (orderId: string, status: OrderStatus) => Promise<void>;
   deleteOrder: (orderId: string) => Promise<void>;
   updateProfile: (payload: {
@@ -141,38 +141,55 @@ export function GoPrintProvider({ children }: { children: ReactNode }) {
     setMessage("Anda telah logout dari GoPrint.");
   }
 
-  async function createOrder(form: OrderFormState, file: File | null) {
+  async function createOrder(form: OrderFormState) {
     if (!session) {
-      return;
+      return false;
     }
 
     setIsLoading(true);
 
     try {
-      if (!file) {
-        throw new Error("Silakan pilih file dokumen terlebih dahulu");
+      if (form.items.length === 0) {
+        throw new Error("Silakan upload minimal satu file dokumen");
       }
 
       if (form.pickupMethod === "delivery" && !form.deliveryAddress.trim()) {
         throw new Error("Alamat pengantaran wajib diisi jika memilih metode delivery");
       }
 
-      if (form.printQty < 1 && form.copyQty < 1 && form.bindingQty < 1) {
-        throw new Error("Minimal pilih salah satu layanan print, fotokopi, atau jilid");
-      }
+      form.items.forEach((item) => {
+        if (item.printQty < 1 && item.copyQty < 1 && item.bindingQty < 1) {
+          throw new Error(`Minimal pilih satu layanan untuk file ${item.fileName}`);
+        }
+      });
 
-      const base64Content = await readFileAsBase64(file);
-      const uploadResponse = await apiRequest<UploadResponse>(
-        "/uploads",
-        {
-          method: "POST",
-          body: JSON.stringify({
-            fileName: file.name,
-            contentType: file.type || "application/octet-stream",
-            base64Content
-          })
-        },
-        session.token
+      const uploadedItems = await Promise.all(
+        form.items.map(async (item) => {
+          const base64Content = await readFileAsBase64(item.file);
+          const uploadResponse = await apiRequest<UploadResponse>(
+            "/uploads",
+            {
+              method: "POST",
+              body: JSON.stringify({
+                fileName: item.file.name,
+                contentType: item.file.type || "application/octet-stream",
+                base64Content
+              })
+            },
+            session.token
+          );
+
+          return {
+            fileName: item.fileName || item.file.name,
+            fileUrl: uploadResponse.data.url,
+            fileType: item.file.type || item.file.name.split(".").pop()?.toLowerCase() || "document",
+            printQty: Number(item.printQty),
+            copyQty: Number(item.copyQty),
+            bindingQty: Number(item.bindingQty),
+            description: item.description,
+            notes: ""
+          };
+        })
       );
 
       const response = await apiRequest<Order>(
@@ -184,18 +201,7 @@ export function GoPrintProvider({ children }: { children: ReactNode }) {
             paymentMethod: form.paymentMethod,
             deliveryAddress: form.deliveryAddress,
             notes: "",
-            items: [
-              {
-                fileName: form.fileName || file.name,
-                fileUrl: uploadResponse.data.url,
-                fileType: file.type || file.name.split(".").pop()?.toLowerCase() || "document",
-                printQty: Number(form.printQty),
-                copyQty: Number(form.copyQty),
-                bindingQty: Number(form.bindingQty),
-                description: form.description,
-                notes: ""
-              }
-            ]
+            items: uploadedItems
           })
         },
         session.token
@@ -203,8 +209,10 @@ export function GoPrintProvider({ children }: { children: ReactNode }) {
 
       setOrders((currentOrders) => [response.data, ...currentOrders]);
       setMessage(`Pesanan ${response.data.orderCode} berhasil dibuat.`);
+      return true;
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Gagal membuat pesanan");
+      return false;
     } finally {
       setIsLoading(false);
     }

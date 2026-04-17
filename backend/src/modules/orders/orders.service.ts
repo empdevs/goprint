@@ -119,9 +119,19 @@ export function buildOrderSummary(payload: PreviewOrderInput) {
 
 function normalizeOrderItems(items: OrderItemInput[]): NormalizedOrderItem[] {
   return items.map((item) => {
+    const fileName = item.fileName?.trim();
     const printQty = Number(item.printQty ?? 0);
     const copyQty = Number(item.copyQty ?? 0);
     const bindingQty = Number(item.bindingQty ?? 0);
+
+    if (!fileName) {
+      throw new Error("Nama file wajib diisi untuk setiap item pesanan");
+    }
+
+    if (printQty < 1 && copyQty < 1 && bindingQty < 1) {
+      throw new Error(`Minimal pilih satu layanan untuk file ${fileName}`);
+    }
+
     const sourcePrintQty = copyQty > 0 && printQty === 0 ? 1 : 0;
     const totalPrintedSheets = printQty + sourcePrintQty;
     const totalPrice =
@@ -131,7 +141,7 @@ function normalizeOrderItems(items: OrderItemInput[]): NormalizedOrderItem[] {
 
     return {
       id: createId("item"),
-      fileName: item.fileName,
+      fileName,
       fileUrl: item.fileUrl ?? "",
       fileType: item.fileType ?? "document",
       printQty,

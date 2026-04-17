@@ -95,12 +95,18 @@ export type FeedbackFormState = {
   comment: string;
 };
 
-export type OrderFormState = {
+export type OrderDraftItem = {
+  id: string;
+  file: File;
   fileName: string;
   printQty: number;
   copyQty: number;
   bindingQty: number;
   description: string;
+};
+
+export type OrderFormState = {
+  items: OrderDraftItem[];
   pickupMethod: PickupMethod;
   paymentMethod: PaymentMethod;
   deliveryAddress: string;

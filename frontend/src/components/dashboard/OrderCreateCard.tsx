@@ -3,6 +3,7 @@ import {
   FileTextOutlined,
   InboxOutlined,
   MinusOutlined,
+  DeleteOutlined,
   PaperClipOutlined,
   PlusOutlined,
   PrinterOutlined
@@ -30,7 +31,7 @@ const quantityFields = [
 
 export function OrderCreateCard() {
   const { session, isLoading } = useGoPrint();
-  const { orderForm, setOrderForm, selectedFile, setDocumentFile, updateQuantity, handleSubmit } =
+  const { orderForm, setOrderForm, addFiles, removeItem, updateQuantity, updateDescription, handleSubmit } =
     useOrderForm();
 
   if (!session || !["user", "admin"].includes(session.user.role)) {
@@ -51,25 +52,13 @@ export function OrderCreateCard() {
       <Upload.Dragger
         accept=".pdf,.doc,.docx,.ppt,.pptx"
         beforeUpload={(file) => {
-          setDocumentFile(file);
+          addFiles([file]);
           return false;
         }}
         className="order-upload"
-        fileList={
-          selectedFile
-            ? [
-                {
-                  uid: selectedFile.name,
-                  name: selectedFile.name,
-                  status: "done"
-                }
-              ]
-            : []
-        }
-        maxCount={1}
-        onRemove={() => {
-          setDocumentFile(null);
-        }}
+        fileList={[]}
+        multiple
+        showUploadList={false}
       >
         <p className="ant-upload-drag-icon">
           <InboxOutlined />
@@ -80,59 +69,76 @@ export function OrderCreateCard() {
         </Typography.Text>
       </Upload.Dragger>
 
-      <div className="order-cart-item">
-        <div className="order-cart-file">
-          <div className="order-cart-file-icon">
-            <FileTextOutlined />
-          </div>
-          <div>
-            <Typography.Text strong>File dokumen</Typography.Text>
-            <Typography.Paragraph className="order-cart-file-name">
-              {orderForm.fileName || "Nama file akan terisi otomatis setelah upload"}
-            </Typography.Paragraph>
-          </div>
+      {orderForm.items.length === 0 ? (
+        <div className="order-cart-empty">
+          <Typography.Text type="secondary">
+            Belum ada file di keranjang. Upload dokumen pertama untuk mulai membuat pesanan.
+          </Typography.Text>
         </div>
-
-        <Row gutter={[12, 12]}>
-          {quantityFields.map((field) => (
-            <Col key={field.key} lg={8} xs={24}>
-              <div className="quantity-card">
-                <Space align="center" className="quantity-card-title">
-                  {field.icon}
-                  <Typography.Text strong>{field.label}</Typography.Text>
-                </Space>
-                <div className="quantity-stepper">
-                  <Button
-                    icon={<MinusOutlined />}
-                    onClick={() => updateQuantity(field.key, orderForm[field.key] - 1)}
-                  />
-                  <Typography.Text className="quantity-value">{orderForm[field.key]}</Typography.Text>
-                  <Button
-                    icon={<PlusOutlined />}
-                    onClick={() => updateQuantity(field.key, orderForm[field.key] + 1)}
-                  />
+      ) : (
+        <div className="order-cart-list">
+          {orderForm.items.map((item, index) => (
+            <div className="order-cart-item" key={item.id}>
+              <div className="order-cart-top">
+                <div className="order-cart-file">
+                  <div className="order-cart-file-icon">
+                    <FileTextOutlined />
+                  </div>
+                  <div>
+                    <Typography.Text strong>File {index + 1}</Typography.Text>
+                    <Typography.Paragraph className="order-cart-file-name">
+                      {item.fileName}
+                    </Typography.Paragraph>
+                  </div>
                 </div>
+                <Button
+                  danger
+                  icon={<DeleteOutlined />}
+                  onClick={() => removeItem(item.id)}
+                  type="text"
+                >
+                  Hapus
+                </Button>
               </div>
-            </Col>
-          ))}
-        </Row>
 
-        <div style={{ marginTop: 16 }}>
-          <Typography.Text strong>Deskripsi tambahan</Typography.Text>
-          <Input.TextArea
-            placeholder="Contoh: jilid hitam, cover bening, gunakan kertas A4"
-            rows={3}
-            style={{ marginTop: 8 }}
-            value={orderForm.description}
-            onChange={(event) =>
-              setOrderForm((current) => ({
-                ...current,
-                description: event.target.value
-              }))
-            }
-          />
+              <Row gutter={[12, 12]}>
+                {quantityFields.map((field) => (
+                  <Col key={field.key} lg={8} xs={24}>
+                    <div className="quantity-card">
+                      <Space align="center" className="quantity-card-title">
+                        {field.icon}
+                        <Typography.Text strong>{field.label}</Typography.Text>
+                      </Space>
+                      <div className="quantity-stepper">
+                        <Button
+                          icon={<MinusOutlined />}
+                          onClick={() => updateQuantity(item.id, field.key, item[field.key] - 1)}
+                        />
+                        <Typography.Text className="quantity-value">{item[field.key]}</Typography.Text>
+                        <Button
+                          icon={<PlusOutlined />}
+                          onClick={() => updateQuantity(item.id, field.key, item[field.key] + 1)}
+                        />
+                      </div>
+                    </div>
+                  </Col>
+                ))}
+              </Row>
+
+              <div style={{ marginTop: 16 }}>
+                <Typography.Text strong>Deskripsi tambahan</Typography.Text>
+                <Input.TextArea
+                  placeholder="Contoh: jilid hitam, cover bening, gunakan kertas A4"
+                  rows={3}
+                  style={{ marginTop: 8 }}
+                  value={item.description}
+                  onChange={(event) => updateDescription(item.id, event.target.value)}
+                />
+              </div>
+            </div>
+          ))}
         </div>
-      </div>
+      )}
 
       <Divider />
 
@@ -197,7 +203,7 @@ export function OrderCreateCard() {
 
       <Space style={{ marginTop: 20 }} wrap>
         <Button
-          disabled={!selectedFile}
+          disabled={orderForm.items.length === 0}
           loading={isLoading}
           size="large"
           type="primary"
@@ -206,7 +212,7 @@ export function OrderCreateCard() {
           Kirim Pesanan
         </Button>
         <Typography.Text type="secondary">
-          Langkah berikutnya akan kita perluas ke multi-file dalam satu order.
+          Upload file baru kapan saja, lalu setiap file akan masuk sebagai item baru di keranjang.
         </Typography.Text>
       </Space>
     </Card>

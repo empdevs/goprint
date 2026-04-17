@@ -48,11 +48,7 @@ export const initialFeedbackForm: FeedbackFormState = {
 };
 
 export const initialOrderForm: OrderFormState = {
-  fileName: "",
-  printQty: 1,
-  copyQty: 0,
-  bindingQty: 0,
-  description: "",
+  items: [],
   pickupMethod: "pickup",
   paymentMethod: "cash",
   deliveryAddress: ""

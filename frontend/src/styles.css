@@ -446,6 +446,20 @@ textarea {
   border: 1px solid #dce8f6;
 }
 
+.order-cart-list {
+  display: grid;
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.order-cart-empty {
+  margin-top: 18px;
+  padding: 18px;
+  border-radius: 18px;
+  border: 1px dashed #c8dcf4;
+  background: #f8fbff;
+}
+
 .order-cart-file {
   display: flex;
   gap: 14px;
@@ -632,6 +646,17 @@ textarea {
 
   .order-cart-file {
     align-items: flex-start;
+  }
+
+  .order-cart-top {
+    flex-direction: column;
+  }
+
+  .order-cart-file-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    font-size: 1.2rem;
   }
 
   .quantity-stepper {

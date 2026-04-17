@@ -25,6 +25,17 @@ VALUES
     'Basement Kampus'
   ),
   (
+    'c3f56de7-2e5a-4f6e-8d89-6ef2dfb313ce',
+    'Viktor Fast Print',
+    'copyshop2@goprint.local',
+    '081200000004',
+    NULL,
+    NULL,
+    '33e747de0b21ca9151b428e705fb3516:4bc2d047e605ee025b114e5336cd511ebfb2231604a67e978613bdd98d25a0633f7758b9bdace15cd12e9e9251b7e4ffff449ca0ed46f1f8cd26212ac6525809',
+    'copy_shop',
+    'Kantin Kampus'
+  ),
+  (
     '0e64804a-3b0e-4bb6-a8b1-912c370428e8',
     'Alya Mahasiswa',
     'user@goprint.local',
@@ -43,6 +54,27 @@ ON DUPLICATE KEY UPDATE
   password_hash = VALUES(password_hash),
   role = VALUES(role),
   campus_location = VALUES(campus_location);
+
+INSERT INTO copy_shops (id, user_id, shop_name, location_note, is_active)
+VALUES
+  (
+    'b6378b10-6fcb-4a43-8d54-870d540d0b65',
+    '6d49acb3-1c58-4f13-b1ca-b40985a03886',
+    'Basement Print Center',
+    'Basement Kampus, dekat lift utama',
+    TRUE
+  ),
+  (
+    'ef725b85-8aeb-46d8-9402-f632ebf7a7ff',
+    'c3f56de7-2e5a-4f6e-8d89-6ef2dfb313ce',
+    'Viktor Fast Print',
+    'Area kantin kampus, sisi timur',
+    TRUE
+  )
+ON DUPLICATE KEY UPDATE
+  shop_name = VALUES(shop_name),
+  location_note = VALUES(location_note),
+  is_active = VALUES(is_active);
 
 INSERT INTO feedbacks (id, name, nim, study_program, comment)
 VALUES

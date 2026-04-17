@@ -58,6 +58,11 @@ export function OrdersTable({ orders, canDelete = false }: OrdersTableProps) {
         )
       },
       {
+        title: "Gerai",
+        key: "copyShop",
+        render: (_, order) => order.assignedCopyShopName ?? "-"
+      },
+      {
         title: "Layanan",
         key: "services",
         render: (_, order) => (

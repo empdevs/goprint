@@ -47,11 +47,23 @@ export type Feedback = {
   createdAt: string;
 };
 
+export type CopyShop = {
+  id: string;
+  userId: string;
+  shopName: string;
+  locationNote: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type Order = {
   id: string;
   orderCode: string;
   userId: string;
   assignedCopyShopId?: string;
+  assignedCopyShopName?: string;
+  assignedCopyShopLocationNote?: string;
   pickupMethod: PickupMethod;
   paymentMethod: PaymentMethod;
   status: OrderStatus;

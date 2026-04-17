@@ -41,6 +41,8 @@ export type Order = {
   orderCode: string;
   userId: string;
   assignedCopyShopId?: string;
+  assignedCopyShopName?: string;
+  assignedCopyShopLocationNote?: string;
   pickupMethod: PickupMethod;
   paymentMethod: PaymentMethod;
   status: OrderStatus;
@@ -95,6 +97,16 @@ export type FeedbackFormState = {
   comment: string;
 };
 
+export type CopyShop = {
+  id: string;
+  userId: string;
+  shopName: string;
+  locationNote: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type OrderDraftItem = {
   id: string;
   file: File;
@@ -107,6 +119,7 @@ export type OrderDraftItem = {
 
 export type OrderFormState = {
   items: OrderDraftItem[];
+  copyShopId: string;
   pickupMethod: PickupMethod;
   paymentMethod: PaymentMethod;
   deliveryAddress: string;

@@ -31,7 +31,7 @@ CREATE TABLE orders (
   id CHAR(36) PRIMARY KEY,
   order_code VARCHAR(30) NOT NULL UNIQUE,
   user_id CHAR(36) NOT NULL,
-  copy_shop_user_id CHAR(36),
+  copy_shop_id CHAR(36) NOT NULL,
   pickup_method ENUM('pickup', 'delivery') NOT NULL,
   payment_method ENUM('cash', 'bank_transfer') NOT NULL,
   status ENUM(
@@ -52,8 +52,8 @@ CREATE TABLE orders (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   CONSTRAINT fk_orders_user
     FOREIGN KEY (user_id) REFERENCES users(id),
-  CONSTRAINT fk_orders_copy_shop_user
-    FOREIGN KEY (copy_shop_user_id) REFERENCES users(id)
+  CONSTRAINT fk_orders_copy_shop
+    FOREIGN KEY (copy_shop_id) REFERENCES copy_shops(id)
 );
 
 CREATE TABLE order_items (

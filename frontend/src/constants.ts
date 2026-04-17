@@ -49,6 +49,7 @@ export const initialFeedbackForm: FeedbackFormState = {
 
 export const initialOrderForm: OrderFormState = {
   items: [],
+  copyShopId: "",
   pickupMethod: "pickup",
   paymentMethod: "cash",
   deliveryAddress: ""

@@ -16,6 +16,7 @@ import {
   Input,
   Radio,
   Row,
+  Select,
   Space,
   Typography,
   Upload
@@ -30,7 +31,7 @@ const quantityFields = [
 ] as const;
 
 export function OrderCreateCard() {
-  const { session, isLoading } = useGoPrint();
+  const { session, copyShops, isLoading } = useGoPrint();
   const { orderForm, setOrderForm, addFiles, removeItem, updateQuantity, updateDescription, handleSubmit } =
     useOrderForm();
 
@@ -144,6 +145,24 @@ export function OrderCreateCard() {
 
       <Row gutter={[16, 16]}>
         <Col lg={12} xs={24}>
+          <Typography.Text strong>Pilih gerai fotokopi</Typography.Text>
+          <Select
+            options={copyShops.map((shop) => ({
+              label: `${shop.shopName} - ${shop.locationNote}`,
+              value: shop.id
+            }))}
+            placeholder="Pilih gerai fotokopi"
+            style={{ marginTop: 8, width: "100%" }}
+            value={orderForm.copyShopId || undefined}
+            onChange={(value) =>
+              setOrderForm((current) => ({
+                ...current,
+                copyShopId: value
+              }))
+            }
+          />
+        </Col>
+        <Col lg={12} xs={24}>
           <Typography.Text strong>Pembayaran</Typography.Text>
           <Radio.Group
             className="option-group"
@@ -162,7 +181,7 @@ export function OrderCreateCard() {
             }
           />
         </Col>
-        <Col lg={12} xs={24}>
+        <Col lg={24} xs={24}>
           <Typography.Text strong>Metode pengambilan</Typography.Text>
           <Radio.Group
             className="option-group"

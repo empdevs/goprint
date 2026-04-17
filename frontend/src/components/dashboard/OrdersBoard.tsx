@@ -27,6 +27,7 @@ export function OrdersBoard() {
               </div>
 
               <p className="order-meta">
+                {order.assignedCopyShopName ? `${order.assignedCopyShopName} | ` : ""}
                 {order.pickupMethod === "delivery" ? "Diantar" : "Ambil sendiri"} |{" "}
                 {order.paymentMethod === "cash" ? "Cash" : "Transfer"} | Rp
                 {order.totalAmount.toLocaleString("id-ID")}

@@ -2,6 +2,7 @@ import cors from "cors";
 import express from "express";
 import { env } from "./config/env.js";
 import { authRouter } from "./modules/auth/auth.route.js";
+import { copyShopsRouter } from "./modules/copy-shops/copy-shops.route.js";
 import { feedbacksRouter } from "./modules/feedbacks/feedbacks.route.js";
 import { healthRouter } from "./modules/health/health.route.js";
 import { ordersRouter } from "./modules/orders/orders.route.js";
@@ -26,6 +27,7 @@ export function createApp() {
   });
 
   app.use("/api/auth", authRouter);
+  app.use("/api/copy-shops", copyShopsRouter);
   app.use("/api/feedbacks", feedbacksRouter);
   app.use("/api/health", healthRouter);
   app.use("/api/orders", ordersRouter);

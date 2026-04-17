@@ -1,11 +1,26 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { initialOrderForm } from "../constants";
 import { OrderDraftItem } from "../types";
 import { useGoPrint } from "./useGoPrint";
 
 export function useOrderForm() {
-  const { createOrder } = useGoPrint();
+  const { copyShops, createOrder } = useGoPrint();
   const [orderForm, setOrderForm] = useState(initialOrderForm);
+
+  useEffect(() => {
+    if (copyShops.length === 0) {
+      return;
+    }
+
+    setOrderForm((current) =>
+      current.copyShopId
+        ? current
+        : {
+            ...current,
+            copyShopId: copyShops[0].id
+          }
+    );
+  }, [copyShops]);
 
   function addFiles(files: File[]) {
     const nextItems: OrderDraftItem[] = files.map((file) => ({
@@ -60,7 +75,10 @@ export function useOrderForm() {
     const isSuccess = await createOrder(orderForm);
 
     if (isSuccess) {
-      setOrderForm(initialOrderForm);
+      setOrderForm({
+        ...initialOrderForm,
+        copyShopId: copyShops[0]?.id ?? ""
+      });
     }
   }
 

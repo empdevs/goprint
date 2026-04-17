@@ -3,6 +3,7 @@ import { PoolConnection } from "mysql2/promise";
 import { db } from "../../config/database.js";
 import { Order, OrderItem, OrderStatus, PaymentMethod, PickupMethod, User } from "../../types/domain.js";
 import { createId, createOrderCode } from "../../utils/id.js";
+import { getCopyShopById, getCopyShopByUserId } from "../copy-shops/copy-shops.service.js";
 
 type OrderItemInput = {
   fileName: string;
@@ -21,20 +22,20 @@ type PreviewOrderInput = {
 };
 
 type CreateOrderInput = {
+  copyShopId: string;
   pickupMethod: PickupMethod;
   paymentMethod: PaymentMethod;
   notes?: string;
   deliveryAddress?: string;
-  assignedCopyShopId?: string;
   items: OrderItemInput[];
 };
 
 type UpdateOrderInput = Partial<{
+  copyShopId: string;
   pickupMethod: PickupMethod;
   paymentMethod: PaymentMethod;
   notes: string;
   deliveryAddress: string;
-  assignedCopyShopId: string;
   status: OrderStatus;
   items: OrderItemInput[];
 }>;
@@ -43,7 +44,9 @@ type OrderRow = RowDataPacket & {
   id: string;
   order_code: string;
   user_id: string;
-  copy_shop_user_id: string | null;
+  copy_shop_id: string;
+  copy_shop_name: string | null;
+  copy_shop_location_note: string | null;
   pickup_method: PickupMethod;
   payment_method: PaymentMethod;
   status: OrderStatus;
@@ -192,7 +195,9 @@ function mapOrders(rows: OrderRow[], itemRows: OrderItemRow[]) {
       id: row.id,
       orderCode: row.order_code,
       userId: row.user_id,
-      assignedCopyShopId: row.copy_shop_user_id ?? undefined,
+      assignedCopyShopId: row.copy_shop_id,
+      assignedCopyShopName: row.copy_shop_name ?? undefined,
+      assignedCopyShopLocationNote: row.copy_shop_location_note ?? undefined,
       pickupMethod: row.pickup_method,
       paymentMethod: row.payment_method,
       status: row.status,
@@ -210,11 +215,13 @@ function mapOrders(rows: OrderRow[], itemRows: OrderItemRow[]) {
 
 async function findOrders(whereClause = "", params: unknown[] = []) {
   const [orderRows] = await db.query<OrderRow[]>(
-    `SELECT id, order_code, user_id, copy_shop_user_id, pickup_method, payment_method, status,
-            notes, delivery_address, subtotal, delivery_fee, total_amount, created_at, updated_at
-     FROM orders
+    `SELECT o.id, o.order_code, o.user_id, o.copy_shop_id, cs.shop_name AS copy_shop_name,
+            cs.location_note AS copy_shop_location_note, o.pickup_method, o.payment_method, o.status,
+            o.notes, o.delivery_address, o.subtotal, o.delivery_fee, o.total_amount, o.created_at, o.updated_at
+     FROM orders o
+     INNER JOIN copy_shops cs ON cs.id = o.copy_shop_id
      ${whereClause}
-     ORDER BY created_at DESC`,
+     ORDER BY o.created_at DESC`,
     params
   );
 
@@ -243,14 +250,20 @@ export async function listOrders(currentUser?: Pick<User, "id" | "role">) {
   }
 
   if (currentUser.role === "copy_shop") {
-    return findOrders("WHERE copy_shop_user_id = ? OR copy_shop_user_id IS NULL", [currentUser.id]);
+    const shop = await getCopyShopByUserId(currentUser.id);
+
+    if (!shop) {
+      return [];
+    }
+
+    return findOrders("WHERE o.copy_shop_id = ?", [shop.id]);
   }
 
-  return findOrders("WHERE user_id = ?", [currentUser.id]);
+  return findOrders("WHERE o.user_id = ?", [currentUser.id]);
 }
 
 export async function getOrderById(id: string) {
-  const orders = await findOrders("WHERE id = ?", [id]);
+  const orders = await findOrders("WHERE o.id = ?", [id]);
   return orders[0] ?? null;
 }
 
@@ -291,6 +304,16 @@ export async function createOrder(currentUser: Pick<User, "id">, payload: Create
     throw new Error("Pesanan harus memiliki minimal satu file");
   }
 
+  if (!payload.copyShopId) {
+    throw new Error("Gerai fotokopi wajib dipilih");
+  }
+
+  const selectedCopyShop = await getCopyShopById(payload.copyShopId);
+
+  if (!selectedCopyShop || !selectedCopyShop.isActive) {
+    throw new Error("Gerai fotokopi yang dipilih tidak tersedia");
+  }
+
   const pricing = calculatePricing(items, payload.pickupMethod);
   const orderId = createId("order");
   const connection = await db.getConnection();
@@ -299,14 +322,14 @@ export async function createOrder(currentUser: Pick<User, "id">, payload: Create
     await connection.beginTransaction();
     await connection.query<ResultSetHeader>(
       `INSERT INTO orders (
-        id, order_code, user_id, copy_shop_user_id, pickup_method, payment_method, status,
+        id, order_code, user_id, copy_shop_id, pickup_method, payment_method, status,
         notes, delivery_address, subtotal, delivery_fee, total_amount
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         orderId,
         createOrderCode(),
         currentUser.id,
-        payload.assignedCopyShopId ?? null,
+        payload.copyShopId,
         payload.pickupMethod,
         payload.paymentMethod,
         "pending",
@@ -355,6 +378,17 @@ export async function updateOrder(id: string, payload: UpdateOrderInput) {
   }));
 
   const pickupMethod = payload.pickupMethod ?? existingOrder.pickupMethod;
+  const copyShopId = payload.copyShopId ?? existingOrder.assignedCopyShopId;
+
+  if (!copyShopId) {
+    throw new Error("Gerai fotokopi tidak ditemukan");
+  }
+
+  const selectedCopyShop = await getCopyShopById(copyShopId);
+
+  if (!selectedCopyShop || !selectedCopyShop.isActive) {
+    throw new Error("Gerai fotokopi yang dipilih tidak tersedia");
+  }
 
   if (payload.status && payload.status !== existingOrder.status) {
     const isAllowed = isValidStatusTransition(existingOrder.status, payload.status, pickupMethod);
@@ -371,11 +405,11 @@ export async function updateOrder(id: string, payload: UpdateOrderInput) {
     await connection.beginTransaction();
     await connection.query<ResultSetHeader>(
       `UPDATE orders
-       SET copy_shop_user_id = ?, pickup_method = ?, payment_method = ?, status = ?,
+       SET copy_shop_id = ?, pickup_method = ?, payment_method = ?, status = ?,
            notes = ?, delivery_address = ?, subtotal = ?, delivery_fee = ?, total_amount = ?
        WHERE id = ?`,
       [
-        payload.assignedCopyShopId ?? existingOrder.assignedCopyShopId ?? null,
+        copyShopId,
         pickupMethod,
         payload.paymentMethod ?? existingOrder.paymentMethod,
         payload.status ?? existingOrder.status,
@@ -401,7 +435,9 @@ export async function updateOrder(id: string, payload: UpdateOrderInput) {
         paymentMethod: payload.paymentMethod ?? existingOrder.paymentMethod,
         notes: payload.notes ?? existingOrder.notes,
         deliveryAddress: payload.deliveryAddress ?? existingOrder.deliveryAddress,
-        assignedCopyShopId: payload.assignedCopyShopId ?? existingOrder.assignedCopyShopId,
+        assignedCopyShopId: copyShopId,
+        assignedCopyShopName: selectedCopyShop.shopName,
+        assignedCopyShopLocationNote: selectedCopyShop.locationNote,
         items: nextItems.map(({ unitPrintPrice, unitCopyPrice, unitBindingPrice, totalPrice, ...item }) => ({
           ...item,
           unitPrintPrice,

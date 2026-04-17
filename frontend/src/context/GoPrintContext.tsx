@@ -5,6 +5,7 @@ import { readFileAsBase64 } from "../utils/file";
 import {
   AppSession,
   AuthUser,
+  CopyShop,
   Feedback,
   FeedbackFormState,
   Order,
@@ -18,6 +19,7 @@ type GoPrintContextValue = {
   session: AppSession | null;
   orders: Order[];
   users: AuthUser[];
+  copyShops: CopyShop[];
   feedbacks: Feedback[];
   message: string;
   isLoading: boolean;
@@ -44,12 +46,14 @@ export function GoPrintProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<AppSession | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
   const [users, setUsers] = useState<AuthUser[]>([]);
+  const [copyShops, setCopyShops] = useState<CopyShop[]>([]);
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
   const [message, setMessage] = useState("Silakan login untuk mulai menggunakan GoPrint.");
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     void loadFeedbacks();
+    void loadCopyShops();
   }, []);
 
   useEffect(() => {
@@ -153,6 +157,10 @@ export function GoPrintProvider({ children }: { children: ReactNode }) {
         throw new Error("Silakan upload minimal satu file dokumen");
       }
 
+      if (!form.copyShopId) {
+        throw new Error("Silakan pilih gerai fotokopi terlebih dahulu");
+      }
+
       if (form.pickupMethod === "delivery" && !form.deliveryAddress.trim()) {
         throw new Error("Alamat pengantaran wajib diisi jika memilih metode delivery");
       }
@@ -197,6 +205,7 @@ export function GoPrintProvider({ children }: { children: ReactNode }) {
         {
           method: "POST",
           body: JSON.stringify({
+            copyShopId: form.copyShopId,
             pickupMethod: form.pickupMethod,
             paymentMethod: form.paymentMethod,
             deliveryAddress: form.deliveryAddress,
@@ -215,6 +224,15 @@ export function GoPrintProvider({ children }: { children: ReactNode }) {
       return false;
     } finally {
       setIsLoading(false);
+    }
+  }
+
+  async function loadCopyShops() {
+    try {
+      const response = await apiRequest<CopyShop[]>("/copy-shops");
+      setCopyShops(response.data);
+    } catch {
+      setCopyShops([]);
     }
   }
 
@@ -336,6 +354,7 @@ export function GoPrintProvider({ children }: { children: ReactNode }) {
         session,
         orders,
         users,
+        copyShops,
         feedbacks,
         message,
         isLoading,

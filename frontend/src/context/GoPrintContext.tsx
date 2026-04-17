@@ -375,6 +375,7 @@ export function GoPrintProvider({ children }: { children: ReactNode }) {
             name: payload.name,
             nim: payload.nim,
             studyProgram: payload.studyProgram,
+            rating: payload.rating,
             comment: payload.comment
           })
         }

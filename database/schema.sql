@@ -93,6 +93,7 @@ CREATE TABLE feedbacks (
   name VARCHAR(120) NOT NULL,
   nim VARCHAR(30),
   study_program VARCHAR(120),
+  rating TINYINT NOT NULL DEFAULT 0,
   comment TEXT NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

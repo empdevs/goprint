@@ -1,4 +1,4 @@
-import { Button, Card, Col, Form, Input, List, Row, Space, Tabs, Typography } from "antd";
+import { Button, Card, Col, Form, Input, List, Rate, Row, Space, Tabs, Typography } from "antd";
 import { demoAccounts } from "../../constants";
 import { useAuthForm } from "../../hooks/useAuthForm";
 
@@ -136,7 +136,11 @@ export function AuthPanel() {
           <Card className="auth-panel-card">
             <Typography.Title level={4}>Feedback / Komentar</Typography.Title>
             <Form layout="vertical" onFinish={() => void handleFeedbackSubmit()}>
-              <Form.Item label="Nama">
+              <Form.Item
+                label="Nama"
+                required
+                rules={[{ required: true, message: "Nama wajib diisi" }]}
+              >
                 <Input
                   value={feedbackForm.name}
                   onChange={(event) =>
@@ -163,7 +167,22 @@ export function AuthPanel() {
                   }
                 />
               </Form.Item>
-              <Form.Item label="Komentar">
+              <Form.Item label="Rating">
+                <Rate
+                  value={feedbackForm.rating}
+                  onChange={(value) =>
+                    setFeedbackForm((current) => ({
+                      ...current,
+                      rating: value
+                    }))
+                  }
+                />
+              </Form.Item>
+              <Form.Item
+                label="Komentar"
+                required
+                rules={[{ required: true, message: "Komentar wajib diisi" }]}
+              >
                 <Input.TextArea
                   rows={4}
                   value={feedbackForm.comment}
@@ -189,6 +208,7 @@ export function AuthPanel() {
                 <List.Item>
                   <Space direction="vertical" size={2}>
                     <Typography.Text strong>{feedback.name}</Typography.Text>
+                    <Rate disabled value={feedback.rating} />
                     <Typography.Text type="secondary">
                       {feedback.nim || "-"} | {feedback.studyProgram || "-"}
                     </Typography.Text>

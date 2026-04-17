@@ -44,6 +44,7 @@ export const initialFeedbackForm: FeedbackFormState = {
   name: "",
   nim: "",
   studyProgram: "",
+  rating: 0,
   comment: ""
 };
 

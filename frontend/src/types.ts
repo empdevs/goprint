@@ -86,6 +86,7 @@ export type Feedback = {
   name: string;
   nim: string;
   studyProgram: string;
+  rating: number;
   comment: string;
   createdAt: string;
 };
@@ -94,6 +95,7 @@ export type FeedbackFormState = {
   name: string;
   nim: string;
   studyProgram: string;
+  rating: number;
   comment: string;
 };
 

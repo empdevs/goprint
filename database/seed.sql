@@ -76,13 +76,14 @@ ON DUPLICATE KEY UPDATE
   location_note = VALUES(location_note),
   is_active = VALUES(is_active);
 
-INSERT INTO feedbacks (id, name, nim, study_program, comment)
+INSERT INTO feedbacks (id, name, nim, study_program, rating, comment)
 VALUES
   (
     '2ec18d0f-363d-40c7-9351-8e71f3d6dd48',
     'Alya Mahasiswa',
     '221011700123',
     'Teknik Informatika',
+    5,
     'UI GoPrint sudah membantu, tapi akan lebih nyaman kalau feedback publik bisa langsung terlihat di halaman login.'
   ),
   (
@@ -90,10 +91,12 @@ VALUES
     'Bagas Unpam',
     '221011700451',
     'Sistem Informasi',
+    4,
     'Saya suka ide pemesanan online. Akan mantap kalau user bisa pilih gerai fotokopi terdekat.'
   )
 ON DUPLICATE KEY UPDATE
   name = VALUES(name),
   nim = VALUES(nim),
   study_program = VALUES(study_program),
+  rating = VALUES(rating),
   comment = VALUES(comment);

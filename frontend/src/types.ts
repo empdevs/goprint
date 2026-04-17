@@ -129,3 +129,13 @@ export type StatusAction = {
   label: string;
   nextStatus: OrderStatus;
 };
+
+export type CreateCopyShopFormState = {
+  fullName: string;
+  email: string;
+  password: string;
+  phone: string;
+  campusLocation: string;
+  shopName: string;
+  locationNote: string;
+};

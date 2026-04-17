@@ -6,6 +6,7 @@ import {
   AppSession,
   AuthUser,
   CopyShop,
+  CreateCopyShopFormState,
   Feedback,
   FeedbackFormState,
   Order,
@@ -28,6 +29,7 @@ type GoPrintContextValue = {
   register: (form: RegisterFormState) => Promise<void>;
   logout: () => void;
   createOrder: (form: OrderFormState) => Promise<boolean>;
+  createCopyShopAccount: (payload: CreateCopyShopFormState) => Promise<boolean>;
   updateOrderStatus: (orderId: string, status: OrderStatus) => Promise<void>;
   deleteOrder: (orderId: string) => Promise<void>;
   updateProfile: (payload: {
@@ -227,12 +229,51 @@ export function GoPrintProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  async function refreshUsersAndCopyShops(token: string) {
+    const [usersResponse, copyShopsResponse] = await Promise.all([
+      apiRequest<AuthUser[]>("/users", {}, token),
+      apiRequest<CopyShop[]>("/copy-shops")
+    ]);
+
+    setUsers(usersResponse.data);
+    setCopyShops(copyShopsResponse.data);
+  }
+
   async function loadCopyShops() {
     try {
       const response = await apiRequest<CopyShop[]>("/copy-shops");
       setCopyShops(response.data);
     } catch {
       setCopyShops([]);
+    }
+  }
+
+  async function createCopyShopAccount(payload: CreateCopyShopFormState) {
+    if (!session || session.user.role !== "admin") {
+      setMessage("Hanya admin yang dapat membuat akun copy shop.");
+      return false;
+    }
+
+    setIsLoading(true);
+
+    try {
+      await apiRequest<AuthUser>(
+        "/users/copy-shops",
+        {
+          method: "POST",
+          body: JSON.stringify(payload)
+        },
+        session.token
+      );
+
+      await refreshUsersAndCopyShops(session.token);
+      setMessage(`Gerai ${payload.shopName} berhasil dibuat.`);
+      return true;
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Gagal membuat akun copy shop");
+      return false;
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -363,6 +404,7 @@ export function GoPrintProvider({ children }: { children: ReactNode }) {
         register,
         logout,
         createOrder,
+        createCopyShopAccount,
         updateOrderStatus,
         deleteOrder,
         updateProfile,

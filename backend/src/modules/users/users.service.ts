@@ -1,5 +1,7 @@
 import { ResultSetHeader, RowDataPacket } from "mysql2";
 import { db } from "../../config/database.js";
+import { createId } from "../../utils/id.js";
+import { hashPassword } from "../../utils/password.js";
 import { User } from "../../types/domain.js";
 
 type UserRow = RowDataPacket & {
@@ -87,4 +89,79 @@ export async function updateUserProfile(
   );
 
   return getUserById(userId);
+}
+
+export async function createCopyShopAccount(payload: {
+  fullName: string;
+  email: string;
+  password: string;
+  phone: string;
+  campusLocation: string;
+  shopName: string;
+  locationNote: string;
+}) {
+  const normalizedEmail = payload.email.trim().toLowerCase();
+  const [existingUsers] = await db.query<RowDataPacket[]>(
+    `SELECT id
+     FROM users
+     WHERE email = ?
+     LIMIT 1`,
+    [normalizedEmail]
+  );
+
+  if (existingUsers.length > 0) {
+    throw new Error("Email copy shop sudah terdaftar");
+  }
+
+  const userId = createId("user");
+  const copyShopId = createId("copyshop");
+  const passwordHash = hashPassword(payload.password);
+  const connection = await db.getConnection();
+
+  try {
+    await connection.beginTransaction();
+
+    await connection.query<ResultSetHeader>(
+      `INSERT INTO users (id, full_name, email, phone, nim, study_program, password_hash, role, campus_location)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        userId,
+        payload.fullName.trim(),
+        normalizedEmail,
+        payload.phone.trim(),
+        null,
+        null,
+        passwordHash,
+        "copy_shop",
+        payload.campusLocation.trim()
+      ]
+    );
+
+    await connection.query<ResultSetHeader>(
+      `INSERT INTO copy_shops (id, user_id, shop_name, location_note, is_active)
+       VALUES (?, ?, ?, ?, ?)`,
+      [
+        copyShopId,
+        userId,
+        payload.shopName.trim(),
+        payload.locationNote.trim(),
+        true
+      ]
+    );
+
+    await connection.commit();
+  } catch (error) {
+    await connection.rollback();
+    throw error;
+  } finally {
+    connection.release();
+  }
+
+  const user = await getUserById(userId);
+
+  if (!user) {
+    throw new Error("Gagal membuat akun copy shop");
+  }
+
+  return user;
 }

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { getCurrentUser } from "../auth/auth.service.js";
-import { listUsers, updateUserProfile } from "./users.service.js";
+import { createCopyShopAccount, listUsers, updateUserProfile } from "./users.service.js";
 
 export const usersRouter = Router();
 
@@ -26,6 +26,31 @@ usersRouter.get("/", async (_req, res) => {
     res.status(500).json({
       success: false,
       message: error instanceof Error ? error.message : "Gagal mengambil user"
+    });
+  }
+});
+
+usersRouter.post("/copy-shops", async (req, res) => {
+  const user = await getRequestUser(req.headers.authorization);
+
+  if (!user || user.role !== "admin") {
+    return res.status(403).json({
+      success: false,
+      message: "Hanya admin yang dapat membuat akun copy shop"
+    });
+  }
+
+  try {
+    const createdUser = await createCopyShopAccount(req.body);
+
+    return res.status(201).json({
+      success: true,
+      data: createdUser
+    });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: error instanceof Error ? error.message : "Gagal membuat akun copy shop"
     });
   }
 });
